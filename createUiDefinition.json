@@ -1,0 +1,67 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+    "handler": "Microsoft.Azure.CreateUIDef",
+    "version": "0.1.2-preview",
+    "parameters": {
+        "basics": [
+            {
+                "name": "cosmosSelector",
+                "type": "Microsoft.Solutions.ResourceSelector",
+                "label": "Select Cosmos DB Account",
+                "resourceType": "Microsoft.DocumentDB/databaseAccounts",
+                "options": {
+                    "filter": {
+                        "subscription": "onBasics",
+                        "location": "onBasics"
+                    }
+                }
+            },
+            {
+                "name": "identityOption",
+                "type": "Microsoft.Common.OptionsGroup",
+                "label": "Some options group",
+                "defaultValue": "My Identity",
+                "toolTip": "",
+                "constraints": {
+                    "allowedValues": [
+                    {
+                        "label": "My Identity",
+                        "value": "me"
+                    },
+                    {
+                        "label": "Other Identity",
+                        "value": "other"
+                    }
+                    ],
+                    "required": true
+                },
+                "visible": true
+            },
+            {
+                "name": "identityObjectId",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Object Id",
+                "defaultValue": "",
+                "toolTip": "Must be a valid Object Id",
+                "placeholder": "",
+                "multiLine": false,
+                "constraints": {
+                    "required": true,
+                    "validations": [
+                        {
+                            "regex": "^[a-z0-9A-Z]{8}-[a-z0-9A-Z]{4}-[a-z0-9A-Z]{4}-[a-z0-9A-Z]{4}-[a-z0-9A-Z]{12}$",
+                            "message": "A valid object id (guid) is required."
+                        }
+                    ]
+                },
+                "visible": "[equals(basics('identityOption'), 'other')]"
+            }
+        ],
+        "steps": [
+        ],
+        "outputs": {
+            "accountName": "[basics('cosmosSelector').name]",
+            "identityId": "[if(equals(basics('identityOption'), 'me'),'[deployer().objectId]',basics('identityObjectId'))]"
+        }
+    }
+}
